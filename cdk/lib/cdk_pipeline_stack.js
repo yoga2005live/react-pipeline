@@ -16,6 +16,7 @@
 //
 // module.exports = { CdkStack }
 const cdk = require('@aws-cdk/core');
+const {SecretValue} = require("@aws-cdk/core");
 const {CodePipeline, CodePipelineSource, ShellStep} = require('@aws-cdk/pipelines');
 
 class cdk_pipeline_stack extends cdk.Stack {
@@ -25,8 +26,10 @@ class cdk_pipeline_stack extends cdk.Stack {
         const pipeline = new CodePipeline(this, 'Pipeline', {
             pipelineName: 'MyPipeline',
             synth: new ShellStep('Synth', {
-                input: CodePipelineSource.gitHub('yoga2005live/react-pipeline', 'main'),
-                commands: ['cd cdk','npm ci', 'npm run build', 'npx cdk synth']
+                input: CodePipelineSource.gitHub('yoga2005live/react-pipeline', 'main',
+                    {authentication: SecretValue.secretsManager('arn:aws:secretsmanager:us-east-2:975663573741:secret:github-oauth-token_1-80vZpc')}
+                ),
+                commands: ['cd cdk', 'npm ci', 'npm run build', 'npx cdk synth']
             })
         });
     }
